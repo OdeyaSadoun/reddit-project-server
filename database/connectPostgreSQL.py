@@ -1,6 +1,8 @@
 import os
-from dotenv import load_dotenv
 import psycopg2
+from dotenv import load_dotenv
+
+
 load_dotenv()
 
 def create_connection():
@@ -11,9 +13,9 @@ def create_connection():
     port = os.getenv("PORT")
 
     try:
-        conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
-        print("התחברת בהצלחה למסד הנתונים!")
-        return conn
+        connection = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+        print("connected successfully!")
+        return connection
     except Exception as e:
-        print(f"שגיאה במהלך התחברות: {e}")
+        print(f"Error connecting to database: {e}")
         return None
