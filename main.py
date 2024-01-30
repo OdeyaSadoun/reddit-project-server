@@ -1,6 +1,6 @@
-from model.user_model import User
-from schema.user_schema import UserCreate
-from db.session import engine, SessionLocal, Base
+from api.model.user_model import User
+from api.schema.user_schema import UserCreate
+from api.db.session import engine, SessionLocal, Base
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
