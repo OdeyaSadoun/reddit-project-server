@@ -1,7 +1,8 @@
+import datetime
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from api.models.user_model import User
+from api.models import user_model
 from api.schemas import user_schema, auth_schema
 from api.utils import jwt_utils, auth_bearer
 
@@ -9,12 +10,12 @@ from api.utils import jwt_utils, auth_bearer
 
 
 def register_user(user: user_schema.UserCreate, session: Session):
-    existing_user = session.query(User).filter_by(email=user.email).first()
+    existing_user = session.query(user_model.User).filter_by(email=user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
     encrypted_password = jwt_utils.get_hashed_password(user.password)
-    new_user = User(username=user.username, email=user.email, password=encrypted_password)
+    new_user = user_model.User(username=user.username, email=user.email, password=encrypted_password)
 
     session.add(new_user)
     session.commit()
@@ -31,14 +32,14 @@ def get_users(session: Session, jwt_token: str):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired token.")
     
     if payload:
-        users = session.query(User).all()
+        users = session.query(user_model.User).all()
         return users
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired token.")
 
 
 def change_password(request: auth_schema.changepassword, db: Session):
-    user = db.query(User).filter(User.email == request.email).first()
+    user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
 
@@ -50,3 +51,5 @@ def change_password(request: auth_schema.changepassword, db: Session):
     db.commit()
 
     return {"message": "Password changed successfully"}
+
+
