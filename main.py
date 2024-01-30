@@ -1,38 +1,45 @@
-from typing import Annotated
+from model.user_model import User
+from schema.user_schema import UserCreate
+from db.session import engine, SessionLocal, Base
+from fastapi import FastAPI, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
-from fastapi import FastAPI, Query
-from pydantic import BaseModel
+from passlib.context import CryptContext
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-class Item(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+def get_hashed_password(password: str) -> str:
+    return pwd_context.hash(password)
 
+Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
-
-@app.get("/items/")
-async def read_items(q: Annotated[str | None, Query(max_length=50)] = None):
-    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
-    if q:
-        results.update({"q": q})
-    return results
-
-
-@app.post("/items/")
-async def create_item(item: Item):
-    item_dict = item.model_dump()
-    if item.tax:
-        price_with_tax = item.price + item.tax
-        item_dict.update({"price_with_tax": price_with_tax})
-    return item_dict
+def get_session():
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
 
 
-@app.put("/items/{item_id}")
-async def update_item(item_id: int, item: Item, q: str | None = None):
-    result = {"item_id": item_id, **item.model_dump()}
-    if q:
-        result.update({"q": q})
-    return result
+app=FastAPI()
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World in reddit"}
+
+
+@app.post("/register")
+def register_user(user: UserCreate, session: Session = Depends(get_session)):
+    existing_user = session.query(User).filter_by(email=user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    encrypted_password = get_hashed_password(user.password)
+    new_user = User(username=user.username, email=user.email, password=encrypted_password )
+
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+
+    return {new_user}
