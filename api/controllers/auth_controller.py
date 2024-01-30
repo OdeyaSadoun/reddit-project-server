@@ -1,6 +1,7 @@
-import datetime
+from datetime import datetime, timezone, timedelta
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 
 from api.models import user_model, token_model
 from api.schemas import request_schema
@@ -10,6 +11,11 @@ from jwt import InvalidTokenError
 from functools import wraps
 
 from api.utils.jwt_utils import create_access_token, create_refresh_token, verify_password
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def some_protected_endpoint(token: str = Depends(oauth2_scheme)):
+    return {"token": token}
 
 def login(request: request_schema.requestdetails, db: Session):
     user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
@@ -25,7 +31,7 @@ def login(request: request_schema.requestdetails, db: Session):
     access = create_access_token(user.id)
     refresh = create_refresh_token(user.id)
 
-    token_db = token_model.TokenTable(user_id=user.id, access_toke=access, refresh_toke=refresh, status=True)
+    token_db = token_model.TokenTable(user_id=user.id, access_token=access, refresh_token=refresh, status=True)
     db.add(token_db)
     db.commit()
     db.refresh(token_db)
@@ -35,24 +41,30 @@ def login(request: request_schema.requestdetails, db: Session):
     }
 
 
+
 def logout(jwt_token: str, db: Session):
     payload = auth_bearer.decodeJWT(jwt_token)
     user_id = payload['sub']
-    
+
+    now_utc = datetime.now(timezone.utc)  # Get UTC time
+
     token_records = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id).all()
-    
+
     for record in token_records:
-        if (datetime.utcnow() - record.created_date).days > 1:
+        record.created_date = record.created_date.replace(tzinfo=timezone.utc)
+
+        if (now_utc - record.created_date).days > 1:
             db.delete(record)
-    
+
     existing_token = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id, token_model.TokenTable.access_token == jwt_token).first()
-    
+
     if existing_token:
         existing_token.status = False
         db.commit()
         db.refresh(existing_token)
-    
+
     return {"message": "Logout Successfully"}
+
 
 
 def token_required(func):
@@ -61,7 +73,7 @@ def token_required(func):
         try:
             payload = auth_bearer.decodeJWT(kwargs['dependencies'])
             user_id = payload['sub']
-            data = kwargs['session'].query(token_model.TokenTable).filter_by(user_id=user_id, access_toke=kwargs['dependencies'], status=True).first()
+            data = kwargs['session'].query(token_model.TokenTable).filter_by(user_id=user_id, access_token=kwargs['dependencies'], status=True).first()
             if data:
                 return func(kwargs['dependencies'], kwargs['session'])
             else:
