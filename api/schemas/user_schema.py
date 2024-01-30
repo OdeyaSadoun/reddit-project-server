@@ -1,6 +1,12 @@
 from pydantic import BaseModel
-import datetime
+
 class UserCreate(BaseModel):
     username: str
     email: str
     password: str
+
+
+class changepassword(BaseModel):
+    email: str
+    old_password: str
+    new_password: str
