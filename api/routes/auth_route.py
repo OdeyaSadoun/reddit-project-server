@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from controllers.auth_controller import login
-from schemas import TokenSchema, requestdetails
-from database import get_session
+from api.controllers.auth_controller import login, logout
+from api.schemas import auth_schema, request_schema
+from api.db.session import get_session
+from api.utils.auth_bearer import JWTBearer
 
 router = APIRouter()
+jwt_bearer = JWTBearer()
 
-@router.post('/login', response_model=TokenSchema)
-def login_route(request: requestdetails, db: Session = Depends(get_session)):
+@router.post('/login', response_model=auth_schema.TokenSchema)
+def login_route(request: request_schema.requestdetails, db: Session = Depends(get_session)):
     return login(request, db)
 
 @router.post('/logout')

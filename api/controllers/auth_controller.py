@@ -6,7 +6,10 @@ from api.models import user_model, token_model
 from api.schemas import request_schema
 from api.utils import auth_bearer
 
-from utils import create_access_token, create_refresh_token, verify_password
+from jwt import InvalidTokenError
+from functools import wraps
+
+from api.utils.jwt_utils import create_access_token, create_refresh_token, verify_password
 
 def login(request: request_schema.requestdetails, db: Session):
     user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
@@ -50,3 +53,20 @@ def logout(jwt_token: str, db: Session):
         db.refresh(existing_token)
     
     return {"message": "Logout Successfully"}
+
+
+def token_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            payload = auth_bearer.decodeJWT(kwargs['dependencies'])
+            user_id = payload['sub']
+            data = kwargs['session'].query(token_model.TokenTable).filter_by(user_id=user_id, access_toke=kwargs['dependencies'], status=True).first()
+            if data:
+                return func(kwargs['dependencies'], kwargs['session'])
+            else:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token blocked")
+        except InvalidTokenError:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        
+    return wrapper

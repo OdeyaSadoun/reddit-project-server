@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from api.schemas.user_schema import UserCreate
 from api.controllers.user_controller import register_user, get_users
 from api.db.session import get_session
-from api.utils.jwt_utils import JWTBearer
+from api.utils.auth_bearer import JWTBearer
 
 router = APIRouter()
 jwt_bearer = JWTBearer()

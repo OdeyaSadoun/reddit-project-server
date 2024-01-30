@@ -11,3 +11,4 @@ passlib
 bcrypt
 jwt
 jose
+pyjwt
