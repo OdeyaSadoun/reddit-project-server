@@ -14,7 +14,7 @@ class TokenCreate(BaseModel):
     created_date: datetime.datetime
 
 
-class changepassword(BaseModel):
+class ChangePassword(BaseModel):
     email: str
     old_password: str
     new_password: str

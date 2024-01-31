@@ -1,6 +1,7 @@
 import datetime
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from api.db.session import get_session
 
 from api.models import user_model
 from api.schemas import user_schema, auth_schema
@@ -38,7 +39,7 @@ def get_users(session: Session, jwt_token: str):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired token.")
 
 
-def change_password(request: auth_schema.changepassword, db: Session):
+def change_password(request: auth_schema.ChangePassword, db: Session):
     user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
@@ -53,3 +54,16 @@ def change_password(request: auth_schema.changepassword, db: Session):
     return {"message": "Password changed successfully"}
 
 
+def get_user_from_token(token: str = Depends(auth_bearer.JWTBearer()), db: Session = Depends(get_session)):
+
+    try:
+        payload = auth_bearer.decodeJWT(token)
+        user_id = payload['sub']
+        user = db.query(user_model.User).filter(user_model.User.id == user_id).first()
+
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+        return user
+    except auth_bearer.PyJWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
