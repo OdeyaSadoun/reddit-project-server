@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status
 
 from api.models import user_model, token_model
-from api.schemas import request_schema
+from api.schemas import auth_schema
 from api.utils import auth_bearer
 
 from jwt import InvalidTokenError
@@ -17,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 def some_protected_endpoint(token: str = Depends(oauth2_scheme)):
     return {"token": token}
 
-def login(request: request_schema.requestdetails, db: Session):
+def login(request: auth_schema.LoginSchema, db: Session):
     user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email")

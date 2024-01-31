@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 import datetime
+from pydantic import BaseModel
 
 class TokenSchema(BaseModel):
     access_token: str
@@ -18,3 +18,8 @@ class ChangePassword(BaseModel):
     email: str
     old_password: str
     new_password: str
+
+
+class LoginSchema(BaseModel):
+    email: str
+    password: str
