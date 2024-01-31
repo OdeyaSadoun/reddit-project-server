@@ -17,8 +17,8 @@ def some_protected_endpoint(token: str = Depends(oauth2_scheme)):
     return {"token": token}
 
 
-def login(request: auth_schema.LoginSchema, db: Session):
-    user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
+def login(request: auth_schema.LoginSchema, session: Session):
+    user = session.query(user_model.User).filter(user_model.User.email == request.email).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email")
     hashed_pass = user.password
@@ -32,9 +32,10 @@ def login(request: auth_schema.LoginSchema, db: Session):
     refresh = jwt_utils.create_refresh_token(user.id)
 
     token_db = token_model.TokenTable(user_id=user.id, access_token=access, refresh_token=refresh, status=True)
-    db.add(token_db)
-    db.commit()
-    db.refresh(token_db)
+    session.add(token_db)
+    session.commit()
+    session.refresh(token_db)
+    
     return {
         "access_token": access,
         "refresh_token": refresh,

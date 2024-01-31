@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 
 from api.controllers import auth_controller
 from api.db.session import get_session
+from api.models import jwt_bearer_model
 from api.schemas import auth_schema, token_schema
-from api.utils import auth_bearer
 
 router = APIRouter()
-jwt_bearer = auth_bearer.JWTBearer()
+jwt_bearer = jwt_bearer_model.JWTBearer()
 
 
 @router.post('/login', response_model=token_schema.TokenSchemaResponse)

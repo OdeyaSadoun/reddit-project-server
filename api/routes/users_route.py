@@ -3,13 +3,12 @@ from sqlalchemy.orm import Session
 
 from api.controllers import users_controller
 from api.db.session import get_session
-from api.models import user_model
+from api.models import user_model, jwt_bearer_model
 from api.schemas import user_schema
-from api.utils import auth_bearer
 
 
 router = APIRouter()
-jwt_bearer = auth_bearer.JWTBearer()
+jwt_bearer = jwt_bearer_model.JWTBearer()
 
 
 @router.post("/register")

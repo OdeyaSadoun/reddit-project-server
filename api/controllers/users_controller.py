@@ -2,8 +2,8 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from api.db.session import get_session
 
-from api.models import user_model
-from api.schemas import user_schema, auth_schema, token_schema
+from api.models import user_model, jwt_bearer_model
+from api.schemas import user_schema, auth_schema
 from api.utils import jwt_utils, auth_bearer
 
 
@@ -50,7 +50,7 @@ def change_password(request: auth_schema.ChangePasswordSchema, db: Session):
     return {"message": "Password changed successfully"}
 
 
-def get_user_from_token(token: str = Depends(auth_bearer.JWTBearer()), db: Session = Depends(get_session)):
+def get_user_from_token(token: str = Depends(jwt_bearer_model.JWTBearer()), db: Session = Depends(get_session)):
 
     try:
         payload = auth_bearer.decodeJWT(token)
