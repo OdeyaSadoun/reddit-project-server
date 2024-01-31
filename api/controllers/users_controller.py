@@ -60,6 +60,6 @@ def get_user_from_token(token: str = Depends(jwt_bearer_model.JWTBearer()), db: 
         if user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-        return user
+        return user_schema.UserSchemaResponse.from_orm(user)
     except auth_bearer.PyJWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
