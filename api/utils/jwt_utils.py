@@ -1,14 +1,20 @@
-import os
-from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from typing import Union, Any
 from jose import jwt
+from passlib.context import CryptContext
+from typing import Union, Any
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
-REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
-ALGORITHM = "HS256"
-JWT_SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"   # should be kept secret
-JWT_REFRESH_SECRET_KEY = "13ugfdfgh@#$%^@&jkl45678902"
+import os
+from dotenv import load_dotenv
+
+from pathlib import Path
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
+
+ACCESS_TOKEN_EXPIRE_MINUTES : str = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
+REFRESH_TOKEN_EXPIRE_MINUTES : str = os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES")
+ALGORITHM : str = os.getenv("ALGORITHM")
+JWT_SECRET_KEY : str = os.getenv("JWT_SECRET_KEY")
+JWT_REFRESH_SECRET_KEY : str = os.getenv("JWT_REFRESH_SECRET_KEY")
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
