@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+import datetime
+from sqlalchemy import Column, Integer, String, DateTime
+
 from api.db.session import Base
 
 class User(Base):
@@ -7,3 +9,4 @@ class User(Base):
     username = Column(String(50), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
+    created_date = Column(DateTime, default=datetime.datetime.now)

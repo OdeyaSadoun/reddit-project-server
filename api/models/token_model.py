@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
-from api.db.session import Base
 import datetime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
+
+from api.db.session import Base
 
 class TokenTable(Base):
     __tablename__ = "tokens"
