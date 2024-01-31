@@ -5,8 +5,7 @@ class UserSchemaCreate(BaseModel):
     name: str
     email: str
     password: str
-    created_date: datetime.datetime
-
+    
 
 class UserSchemaResponse(BaseModel):
     id: int
