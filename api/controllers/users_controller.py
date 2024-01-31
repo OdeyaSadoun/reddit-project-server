@@ -13,7 +13,7 @@ def register_user(user: user_schema.UserSchemaCreate, session: Session):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     encrypted_password = jwt_utils.get_hashed_password(user.password)
-    new_user = user_model.User(username=user.username, email=user.email, password=encrypted_password)
+    new_user = user_model.User(name=user.name, email=user.email, password=encrypted_password)
 
     session.add(new_user)
     session.commit()
