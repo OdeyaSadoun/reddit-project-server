@@ -13,7 +13,7 @@ jwt_bearer = JWTBearer()
 
 
 @router.post("/register")
-def register(user: user_schema.UserCreate, session: Session = Depends(get_session)):
+def register(user: user_schema.UserSchemaCreate, session: Session = Depends(get_session)):
     return register_user(user, session)
 
 
@@ -22,6 +22,6 @@ def get_users_route(jwt_token: str = Depends(jwt_bearer), session: Session = Dep
     return get_users(session, jwt_token)
 
 
-@router.get("/get_user_info", response_model=user_schema.UserCreate)
+@router.get("/get_user_info", response_model=user_schema.UserSchemaResponse)
 def get_user_info(user: user_model.User = Depends(get_user_from_token)):
     return user

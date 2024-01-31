@@ -1,35 +1,35 @@
 from datetime import datetime, timezone, timedelta
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, status, security
+from functools import wraps
+from jwt import InvalidTokenError
 from sqlalchemy.orm import Session
-from fastapi import Depends, HTTPException, status
 
 from api.models import user_model, token_model
 from api.schemas import auth_schema
-from api.utils import auth_bearer
+from api.utils import auth_bearer, jwt_utils
 
-from jwt import InvalidTokenError
-from functools import wraps
 
-from api.utils.jwt_utils import create_access_token, create_refresh_token, verify_password
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl="token")
+
 
 def some_protected_endpoint(token: str = Depends(oauth2_scheme)):
     return {"token": token}
+
 
 def login(request: auth_schema.LoginSchema, db: Session):
     user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email")
     hashed_pass = user.password
-    if not verify_password(request.password, hashed_pass):
+    if not jwt_utils.verify_password(request.password, hashed_pass):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect password"
         )
 
-    access = create_access_token(user.id)
-    refresh = create_refresh_token(user.id)
+    access = jwt_utils.create_access_token(user.id)
+    refresh = jwt_utils.create_refresh_token(user.id)
 
     token_db = token_model.TokenTable(user_id=user.id, access_token=access, refresh_token=refresh, status=True)
     db.add(token_db)
@@ -39,7 +39,6 @@ def login(request: auth_schema.LoginSchema, db: Session):
         "access_token": access,
         "refresh_token": refresh,
     }
-
 
 
 def logout(jwt_token: str, db: Session):
@@ -64,7 +63,6 @@ def logout(jwt_token: str, db: Session):
         db.refresh(existing_token)
 
     return {"message": "Logout Successfully"}
-
 
 
 def token_required(func):

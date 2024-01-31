@@ -1,16 +1,13 @@
-import datetime
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from api.db.session import get_session
 
 from api.models import user_model
-from api.schemas import user_schema, auth_schema
+from api.schemas import user_schema, auth_schema, token_schema
 from api.utils import jwt_utils, auth_bearer
 
-# from utils import verify_password, get_hashed_password
 
-
-def register_user(user: user_schema.UserCreate, session: Session):
+def register_user(user: user_schema.UserSchemaCreate, session: Session):
     existing_user = session.query(user_model.User).filter_by(email=user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -26,7 +23,6 @@ def register_user(user: user_schema.UserCreate, session: Session):
 
 
 def get_users(session: Session, jwt_token: str):
-    # Add any additional logic for user retrieval or validation based on the token
     try:
         payload = jwt_utils.decodeJWT(jwt_token)
     except:
@@ -39,7 +35,7 @@ def get_users(session: Session, jwt_token: str):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or expired token.")
 
 
-def change_password(request: auth_schema.ChangePassword, db: Session):
+def change_password(request: auth_schema.ChangePasswordSchema, db: Session):
     user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
