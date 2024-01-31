@@ -19,7 +19,7 @@ def register_user(user: user_schema.UserSchemaCreate, session: Session):
     session.commit()
     session.refresh(new_user)
 
-    return {"message": "user created successfully", "user": new_user}
+    return {"message": "user created successfully", "user": user_schema.UserSchemaResponse.from_orm(new_user)}
 
 
 def get_users(session: Session, jwt_token: str):
