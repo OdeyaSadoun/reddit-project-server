@@ -1,4 +1,4 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from fastapi import Depends, HTTPException, status, security
 from functools import wraps
 from jwt import InvalidTokenError
