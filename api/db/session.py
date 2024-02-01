@@ -11,6 +11,7 @@ Base = declarative_base()
 
 SessionLocal = sessionmaker(expire_on_commit=False, bind=engine)
 
+
 def get_session():
     session = SessionLocal()
     try:
