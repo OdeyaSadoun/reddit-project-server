@@ -31,10 +31,10 @@ def login(request: auth_schema.LoginSchema, session: Session):
     access = jwt_utils.create_access_token(user.id)
     refresh = jwt_utils.create_refresh_token(user.id)
 
-    token_db = token_model.TokenTable(user_id=user.id, access_token=access, refresh_token=refresh, status=True)
-    session.add(token_db)
+    new_token = token_model.TokenTable(user_id=user.id, access_token=access, refresh_token=refresh, status=True)
+    session.add(new_token)
     session.commit()
-    session.refresh(token_db)
+    session.refresh(new_token)
     
     return {
         "access_token": access,
@@ -42,26 +42,26 @@ def login(request: auth_schema.LoginSchema, session: Session):
     }
 
 
-def logout(jwt_token: str, db: Session):
+def logout(jwt_token: str, session: Session):
     payload = auth_bearer.decodeJWT(jwt_token)
     user_id = payload['sub']
 
     now_utc = datetime.now(timezone.utc)  # Get UTC time
 
-    token_records = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id).all()
+    token_records = session.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id).all()
 
     for record in token_records:
         record.created_date = record.created_date.replace(tzinfo=timezone.utc)
 
         if (now_utc - record.created_date).days > 1:
-            db.delete(record)
+            session.delete(record)
 
-    existing_token = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id, token_model.TokenTable.access_token == jwt_token).first()
+    existing_token = session.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id, token_model.TokenTable.access_token == jwt_token).first()
 
     if existing_token:
         existing_token.status = False
-        db.commit()
-        db.refresh(existing_token)
+        session.commit()
+        session.refresh(existing_token)
 
     return {"message": "Logout Successfully"}
 
