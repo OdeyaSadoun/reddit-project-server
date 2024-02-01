@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException, status
+import jwt
 from sqlalchemy.orm import Session
 from api.db.session import get_session
 
@@ -27,10 +28,10 @@ def change_password(request: auth_schema.ChangePasswordSchema, session: Session)
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
 
-    if not auth_bearer.verify_password(request.old_password, user.password):
+    if not jwt_utils.verify_password(request.old_password, user.password):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid old password")
 
-    encrypted_password = auth_bearer.get_hashed_password(request.new_password)
+    encrypted_password = jwt_utils.get_hashed_password(request.new_password)
     user.password = encrypted_password
     session.commit()
 
@@ -48,5 +49,5 @@ def get_user_from_token(token: str = Depends(jwt_bearer_model.JWTBearer()), sess
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         return user_schema.UserSchemaResponse.from_orm(user)
-    except auth_bearer.PyJWTError:
+    except jwt.PyJWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
