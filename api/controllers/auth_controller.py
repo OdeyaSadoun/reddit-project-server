@@ -8,8 +8,6 @@ from api.models import user_model, token_model
 from api.schemas import auth_schema
 from api.utils import auth_bearer, jwt_utils
 
-
-
 oauth2_scheme = security.OAuth2PasswordBearer(tokenUrl="token")
 
 
@@ -35,7 +33,7 @@ def login(request: auth_schema.LoginSchema, session: Session):
     session.add(new_token)
     session.commit()
     session.refresh(new_token)
-    
+
     return {
         "access_token": access,
         "refresh_token": refresh,
@@ -56,7 +54,8 @@ def logout(jwt_token: str, session: Session):
         if (now_utc - record.created_date).days > 1:
             session.delete(record)
 
-    existing_token = session.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id, token_model.TokenTable.access_token == jwt_token).first()
+    existing_token = session.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id,
+                                                                  token_model.TokenTable.access_token == jwt_token).first()
 
     if existing_token:
         existing_token.status = False
@@ -72,12 +71,14 @@ def token_required(func):
         try:
             payload = auth_bearer.decodeJWT(kwargs['dependencies'])
             user_id = payload['sub']
-            data = kwargs['session'].query(token_model.TokenTable).filter_by(user_id=user_id, access_token=kwargs['dependencies'], status=True).first()
+            data = kwargs['session'].query(token_model.TokenTable).filter_by(user_id=user_id,
+                                                                             access_token=kwargs['dependencies'],
+                                                                             status=True).first()
             if data:
                 return func(kwargs['dependencies'], kwargs['session'])
             else:
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token blocked")
         except InvalidTokenError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        
+
     return wrapper
