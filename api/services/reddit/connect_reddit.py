@@ -37,7 +37,7 @@ def get_posts_by_subreddit(subreddit: str):
 def get_posts_by_subreddit_and_category(subreddit: str, category: str):
     headers = get_headers_from_connection_to_reddit_by_access_token()
     res = requests.get(f'https://oauth.reddit.com/r/{subreddit}/{category}', headers=headers)
-    
+
     post_list = []
     for post in res.json()['data']['children']:
         post_list.append(
