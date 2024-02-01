@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class ChangePasswordSchema(BaseModel):
     email: str
     old_password: str

@@ -1,11 +1,12 @@
 import datetime
 from pydantic import BaseModel
 
+
 class UserSchemaCreate(BaseModel):
     name: str
     email: str
     password: str
-    
+
 
 class UserSchemaResponse(BaseModel):
     id: int
@@ -13,6 +14,4 @@ class UserSchemaResponse(BaseModel):
     email: str
 
     class Config:
-        orm_mode = True    
-
-
+        orm_mode = True
