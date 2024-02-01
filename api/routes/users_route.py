@@ -6,7 +6,6 @@ from api.db.session import get_session
 from api.models import user_model, jwt_bearer_model
 from api.schemas import user_schema
 
-
 router = APIRouter()
 jwt_bearer = jwt_bearer_model.JWTBearer()
 
