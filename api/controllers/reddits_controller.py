@@ -1,3 +1,7 @@
+from sqlalchemy.orm import Session
+from api.models import reddit_model
+from fastapi import HTTPException
+
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -5,6 +9,23 @@ import requests
 
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
+
+
+def save_reddit_data(db: Session, reddit_data: dict):
+    try:
+        # Create an instance of the RedditSearch model
+        reddit_search_instance = reddit_model.RedditSearch(**reddit_data)
+
+        # Add the instance to the session
+        db.add(reddit_search_instance)
+
+        # Commit the changes to the database
+        db.commit()
+
+        return {"message": "Data saved successfully"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error saving data: {str(e)}")
 
 
 def get_headers_from_connection_to_reddit_by_access_token():
@@ -30,6 +51,7 @@ def get_headers_from_connection_to_reddit_by_access_token():
 
 
 def get_posts_by_subreddit(subreddit: str):
+    print("in func")
     # for default get the new posts, default amount = 25
     return get_posts_by_subreddit_and_category(subreddit=subreddit, category="new")
 
@@ -53,4 +75,4 @@ def get_posts_by_subreddit_and_category(subreddit: str, category: str):
 
     return post_list
 
-print(get_posts_by_subreddit("python"))
+
