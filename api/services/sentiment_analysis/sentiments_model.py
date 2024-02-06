@@ -34,4 +34,4 @@ def sentiment_classify(text):
     return label
 
 
-print(f"Sentiment: {sentiment_classify('love')}")
+# print(f"Sentiment: {sentiment_classify('love')}")
