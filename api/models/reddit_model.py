@@ -5,10 +5,10 @@ from sqlalchemy.dialects.postgresql import ARRAY, ENUM
 from api.db.session import Base
 
 class ModelRedditCategory(str, Enum):
-    hot = "Hot"
-    rising = "Rising"
-    top = "Top"
-    new = "New"
+    hot = "hot"
+    rising = "rising"
+    top = "top"
+    new = "new"
 
 
 

@@ -4,10 +4,10 @@ from enum import Enum  # Import the Enum class
 
 
 class ModelRedditCategory(str, Enum):
-    hot = "Hot"
-    rising = "Rising"
-    top = "Top"
-    new = "New"
+    hot = "hot"
+    rising = "rising"
+    top = "top"
+    new = "new"
 
 
 
