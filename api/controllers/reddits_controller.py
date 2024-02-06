@@ -96,5 +96,18 @@ def get_posts_from_reddit(subreddit: str, category: str):
     # print(posts)
     return get_format_posts_data(posts)
 
-
+def create_reddit_search(db: Session, reddit: str, category: str, search_list: list[str]):
+    # Create an instance of RedditSearch model
+    db_reddit_search = models.RedditSearch(reddit=reddit, category=category, search_list=search_list)
+    
+    # Add the instance to the session
+    db.add(db_reddit_search)
+    
+    # Commit the transaction to the database
+    db.commit()
+    
+    # Refresh the instance to get the updated values
+    db.refresh(db_reddit_search)
+    
+    return db_reddit_search
 
