@@ -96,9 +96,9 @@ def get_posts_from_reddit(subreddit: str, category: str):
     # print(posts)
     return get_format_posts_data(posts)
 
-def create_reddit_search(db: Session, reddit: str, category: str, search_list: list[str]):
+def create_reddit_search(db: Session, reddit: str, category: str, user_id: int):
     # Create an instance of RedditSearch model
-    db_reddit_search = models.RedditSearch(reddit=reddit, category=category, search_list=search_list)
+    db_reddit_search = models.RedditSearch(user_id=user_id, reddit=reddit, category=category)
     
     # Add the instance to the session
     db.add(db_reddit_search)

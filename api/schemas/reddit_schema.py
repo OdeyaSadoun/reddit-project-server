@@ -15,7 +15,6 @@ class RedditSearchBase(BaseModel):
     user_id: int
     reddit: str
     category: ModelRedditCategory
-    search_list: List[str]
 
 class RedditSearchCreate(RedditSearchBase):
     pass

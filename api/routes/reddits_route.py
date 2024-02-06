@@ -20,4 +20,4 @@ def get_posts(subreddit: str, category: str):
 
 @router.post("/redditsearches/", response_model=reddit_schema.RedditSearch)
 def create_reddit_search(reddit_search: reddit_schema.RedditSearchCreate, db: Session = Depends(get_session)):
-    return reddits_controller.create_reddit_search(db=db, user_id=reddit_search.user_id,reddit=reddit_search.reddit, category=reddit_search.category, search_list=reddit_search.search_list)
+    return reddits_controller.create_reddit_search(db=db, user_id=reddit_search.user_id,reddit=reddit_search.reddit, category=reddit_search.category)
