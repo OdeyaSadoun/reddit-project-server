@@ -11,6 +11,6 @@ router = APIRouter()
 
 
 @router.get("/get_posts_by_subreddit")
-def get_posts(subreddit: str):
+def get_posts(subreddit: str, category: str):
     print("in route")
-    return reddits_controller.get_posts_by_subreddit(subreddit)
+    return reddits_controller.get_posts_from_reddit(subreddit, category)
