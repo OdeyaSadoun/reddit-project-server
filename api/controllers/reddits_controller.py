@@ -3,6 +3,8 @@ from api.models import reddit_model
 from fastapi import HTTPException
 from typing import List
 
+from api.models import reddit_model  # Import RedditSearch model
+from api.schemas import reddit_schema  # Import schema definitions
 
 import os
 from dotenv import load_dotenv
@@ -96,9 +98,11 @@ def get_posts_from_reddit(subreddit: str, category: str):
     # print(posts)
     return get_format_posts_data(posts)
 
-def create_reddit_search(db: Session, reddit: str, category: str, user_id: int):
+
+
+def create_reddit_search(db: Session, reddit: str, category: reddit_schema.ModelRedditCategory, user_id: int):
     # Create an instance of RedditSearch model
-    db_reddit_search = models.RedditSearch(user_id=user_id, reddit=reddit, category=category)
+    db_reddit_search = reddit_model.RedditSearch(user_id=user_id, reddit=reddit, category=category)
     
     # Add the instance to the session
     db.add(db_reddit_search)
@@ -110,4 +114,3 @@ def create_reddit_search(db: Session, reddit: str, category: str, user_id: int):
     db.refresh(db_reddit_search)
     
     return db_reddit_search
-

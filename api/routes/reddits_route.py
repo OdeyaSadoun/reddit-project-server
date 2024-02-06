@@ -18,6 +18,7 @@ def get_posts(subreddit: str, category: str):
     print("in route")
     return reddits_controller.get_posts_from_reddit(subreddit, category)
 
-@router.post("/redditsearches/", response_model=reddit_schema.RedditSearch)
+@router.post("/redditsearches")
 def create_reddit_search(reddit_search: reddit_schema.RedditSearchCreate, db: Session = Depends(get_session)):
-    return reddits_controller.create_reddit_search(db=db, user_id=reddit_search.user_id,reddit=reddit_search.reddit, category=reddit_search.category)
+    print("enter route")
+    return reddits_controller.create_reddit_search(db, reddit_search.reddit, reddit_search.category, reddit_search.user_id)
