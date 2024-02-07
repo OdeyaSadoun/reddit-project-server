@@ -3,8 +3,8 @@ from api.models import reddit_model
 from fastapi import HTTPException
 from typing import List
 
-from api.models import reddit_model  # Import RedditSearch model
-from api.schemas import reddit_schema  # Import schema definitions
+from api.models import reddit_model, subreddit_model
+from api.schemas import reddit_schema, subreddit_schema
 
 import os
 from dotenv import load_dotenv
@@ -99,7 +99,6 @@ def get_posts_from_reddit(subreddit: str, category: str):
     return get_format_posts_data(posts)
 
 
-
 def create_reddit_search(db: Session, reddit: str, category: reddit_schema.ModelRedditCategory, user_id: int):
     # Create an instance of RedditSearch model
     db_reddit_search = reddit_model.RedditSearch(user_id=user_id, reddit=reddit, category=category)
@@ -114,3 +113,23 @@ def create_reddit_search(db: Session, reddit: str, category: reddit_schema.Model
     db.refresh(db_reddit_search)
     
     return db_reddit_search
+
+
+def create_subreddits_search(db: Session, subreddits: list[subreddit_schema.SubredditSearchCreate]):
+    # Create an instance of RedditSearch model
+    
+    db_subreddits_search = []
+    for subreddit in subreddits:
+        db_subreddit_search = subreddit_model.SubredditSearch(reddit_id=subreddit.reddit_id, title=subreddit.title, selftext=subreddit.selftext, sentiment=subreddit.sentiment, ups=subreddit.ups, downs=subreddit.downs, score=subreddit.score)
+    
+        # Add the instance to the session
+        db.add(db_subreddit_search)
+    
+        # Commit the transaction to the database
+        db.commit()
+    
+        # Refresh the instance to get the updated values
+        db.refresh(db_subreddit_search)
+        db_subreddits_search.append(db_subreddit_search)
+    
+    return db_subreddits_search

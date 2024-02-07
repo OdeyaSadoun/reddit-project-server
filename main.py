@@ -10,7 +10,6 @@ Base.metadata.create_all(bind=engine)
 app=FastAPI()
 
 origins = [
-    "http://localhost",      # Update this with the origin of your frontend application
     "http://localhost:3000", # Update this with the actual URL of your frontend application
 ]
 
