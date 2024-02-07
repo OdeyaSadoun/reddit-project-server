@@ -1,5 +1,8 @@
 from sqlalchemy import Column, Integer, String, Text, Double
 from sqlalchemy.ext.declarative import declarative_base
+from enum import Enum  # Import the Enum class
+from pydantic import BaseModel
+
 class ModelRedditSentiment(str, Enum):
     positive = "positive"
     negative = "negative"
@@ -14,10 +17,10 @@ class SubredditSearchBase(BaseModel):
     downs: int
     score: float
 
-class SubredditSearchCreate(RedditSearchBase):
+class SubredditSearchCreate(SubredditSearchBase):
     pass
 
-class SubredditSearch(RedditSearchBase):
+class SubredditSearch(SubredditSearchBase):
     id: int
 
     class Config:

@@ -11,7 +11,6 @@ class ModelRedditCategory(str, Enum):
     new = "new"
 
 
-
 class RedditSearch(Base):
     __tablename__ = 'redditsearches'
     id = Column(Integer, primary_key=True, index=True)
