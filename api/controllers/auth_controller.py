@@ -82,3 +82,4 @@ def token_required(func):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
     return wrapper
+

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, security
 from sqlalchemy.orm import Session
 # from api.db.session import get_db
 from api.db.session import get_session
@@ -7,6 +7,8 @@ from typing import List
 
 from api.controllers import reddits_controller
 from api.schemas import reddit_schema, subreddit_schema
+from api.utils import auth_bearer
+from api.models import jwt_bearer_model
 router = APIRouter()
 
 # @router.post("/save_reddit_data")
@@ -31,3 +33,16 @@ def create_reddit_search(reddit_search: reddit_schema.RedditSearchCreate, db: Se
 def create_subreddit_search(subreddit_search: List[subreddit_schema.SubredditSearchCreate], db: Session = Depends(get_session)):
     print("enter route subreddit")
     return reddits_controller.create_subreddits_search(db, subreddit_search)
+
+
+@router.get("/")
+def get_history():
+    print('**************')
+    # return reddits_controller.get_recent_searches_for_user(db)
+    return {"message" : "aaaaa"}
+
+
+@router.get("/recent")
+def get_recent_searches(db: Session = Depends(get_session)):
+    print("999999")
+    return reddits_controller.get_recent_searches_for_user(db)

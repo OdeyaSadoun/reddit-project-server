@@ -10,10 +10,18 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 import requests
+from fastapi import Depends, HTTPException
+
 from api.services.sentiment_analysis import sentiments_model
 
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
+
+# def get_current_user(token: str = Depends(oauth2_scheme)):
+#     user = get_user(token)
+#     if user is None:
+#         raise HTTPException(status_code=401, detail="Invalid credentials")
+#     return user
 
 
 def save_reddit_data(db: Session, reddit_data: dict):
@@ -116,8 +124,9 @@ def create_reddit_search(db: Session, reddit: str, category: reddit_schema.Model
 
 
 def create_subreddits_search(db: Session, subreddits: list[subreddit_schema.SubredditSearchCreate]):
+
     # Create an instance of RedditSearch model
-    
+
     db_subreddits_search = []
     for subreddit in subreddits:
         db_subreddit_search = subreddit_model.SubredditSearch(reddit_id=subreddit.reddit_id, title=subreddit.title, selftext=subreddit.selftext, sentiment=subreddit.sentiment, ups=subreddit.ups, downs=subreddit.downs, score=subreddit.score)
@@ -133,3 +142,6 @@ def create_subreddits_search(db: Session, subreddits: list[subreddit_schema.Subr
         db_subreddits_search.append(db_subreddit_search)
     
     return db_subreddits_search
+
+def get_recent_searches_for_user(db: Session):
+    return db.query(reddit_model.RedditSearch).all()

@@ -17,9 +17,9 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_credentials=True,  # Set this to True if your frontend application sends credentials (like cookies) with the requests
+    allow_methods=["*"],  # Update this with the allowed HTTP methods
+    allow_headers=["*"],  # Update this with the allowed request headers
 )
 
 app.include_router(users_route.router, prefix="/users", tags=["users"])
