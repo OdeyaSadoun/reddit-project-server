@@ -143,5 +143,5 @@ def create_subreddits_search(db: Session, subreddits: list[subreddit_schema.Subr
     
     return db_subreddits_search
 
-def get_recent_searches_for_user(db: Session):
-    return db.query(reddit_model.RedditSearch).all()
+def get_recent_searches_for_user(db: Session, user_id: int):
+    return db.query(reddit_model.RedditSearch).filter(reddit_model.RedditSearch.user_id == user_id).all()

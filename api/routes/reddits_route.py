@@ -41,8 +41,13 @@ def get_history():
     # return reddits_controller.get_recent_searches_for_user(db)
     return {"message" : "aaaaa"}
 
+jwt_bearer = jwt_bearer_model.JWTBearer()
 
 @router.get("/recent")
-def get_recent_searches(db: Session = Depends(get_session)):
-    print("999999")
-    return reddits_controller.get_recent_searches_for_user(db)
+def get_recent_searches(db: Session = Depends(get_session),jwt_token: str = Depends(jwt_bearer)):
+    payload = auth_bearer.decodeJWT(jwt_token)
+    user_id = payload['sub']
+
+    # user_id = int(user_id)
+    print(user_id)
+    return reddits_controller.get_recent_searches_for_user(db,user_id)
