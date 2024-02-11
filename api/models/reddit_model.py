@@ -17,3 +17,5 @@ class RedditSearch(Base):
     user_id = Column(Integer, nullable=False)
     reddit = Column(String(100), nullable=False, index=True)
     category = Column(ENUM(ModelRedditCategory), nullable=False, index=True)  # Use ENUM from SQLAlchemy
+    created_date = Column(DateTime, default=datetime.datetime.now)
+

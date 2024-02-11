@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from api.models import reddit_model
+from api.models import reddit_model, subreddit_model
 from fastapi import HTTPException
 from typing import List
 
@@ -143,5 +143,10 @@ def create_subreddits_search(db: Session, subreddits: list[subreddit_schema.Subr
     
     return db_subreddits_search
 
+
 def get_recent_searches_for_user(db: Session, user_id: int):
     return db.query(reddit_model.RedditSearch).filter(reddit_model.RedditSearch.user_id == user_id).all()
+
+
+def get_history_posts_by_reddit_id(db: Session, reddit_id: int):
+    return db.query(subreddit_model.SubredditSearch).filter(subreddit_model.SubredditSearch.reddit_id == reddit_id).all()

@@ -51,3 +51,8 @@ def get_recent_searches(db: Session = Depends(get_session),jwt_token: str = Depe
     # user_id = int(user_id)
     print(user_id)
     return reddits_controller.get_recent_searches_for_user(db,user_id)
+
+
+@router.get("/history/{reddit_id}")
+def get_recent_searches_for_user(reddit_id: int, db: Session = Depends(get_session)):
+    return reddits_controller.get_history_posts_by_reddit_id(db, reddit_id)
