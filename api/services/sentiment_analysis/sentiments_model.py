@@ -33,5 +33,3 @@ def sentiment_classify(text):
     label = get_label(config, ranking)
     return label
 
-
-# print(f"Sentiment: {sentiment_classify('love')}")

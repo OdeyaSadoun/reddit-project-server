@@ -1,15 +1,7 @@
 import datetime
 from pydantic import BaseModel
-from typing import List
-from enum import Enum  # Import the Enum class
 
-
-class ModelRedditCategory(str, Enum):
-    hot = "hot"
-    rising = "rising"
-    top = "top"
-    new = "new"
-
+from api.enums.reddit_category_enum import ModelRedditCategory
 
 
 class RedditSearchBase(BaseModel):

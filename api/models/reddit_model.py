@@ -1,14 +1,8 @@
 import datetime
 from sqlalchemy import Column, Integer, String, DateTime
-from enum import Enum  # Import the Enum class
-from sqlalchemy.dialects.postgresql import ARRAY, ENUM
+from sqlalchemy.dialects.postgresql import ENUM
 from api.db.session import Base
-
-class ModelRedditCategory(str, Enum):
-    hot = "hot"
-    rising = "rising"
-    top = "top"
-    new = "new"
+from api.enums.reddit_category_enum import ModelRedditCategory
 
 
 class RedditSearch(Base):
@@ -16,6 +10,6 @@ class RedditSearch(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
     reddit = Column(String(100), nullable=False, index=True)
-    category = Column(ENUM(ModelRedditCategory), nullable=False, index=True)  # Use ENUM from SQLAlchemy
+    category = Column(ENUM(ModelRedditCategory), nullable=False, index=True)
     created_date = Column(DateTime, default=datetime.datetime.now)
 

@@ -1,14 +1,11 @@
 import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Text, Float
-from enum import Enum
-from sqlalchemy.dialects.postgresql import ARRAY, ENUM
+from sqlalchemy import Column, Integer, String, Text, Float
+from sqlalchemy.dialects.postgresql import ENUM
 from api.db.session import Base
 from sqlalchemy.orm import validates
 
-class ModelRedditSentiment(str, Enum):
-    positive = "positive"
-    negative = "negative"
-    neutral = "neutral"
+from api.enums.reddit_sentiment_enum import ModelRedditSentiment
+
 
 class SubredditSearch(Base):
     __tablename__ = 'subredditsearches'
@@ -24,5 +21,5 @@ class SubredditSearch(Base):
     @validates('selftext')
     def validate_selftext(self, key, value):
         if len(value) > 2000:
-            value = value[:2000]  # חיתוך המחרוזת לאורך מקסימלי של 6000 תווים
+            value = value[:2000] 
         return value

@@ -1,12 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, Double
-from sqlalchemy.ext.declarative import declarative_base
-from enum import Enum  # Import the Enum class
 from pydantic import BaseModel
 
-class ModelRedditSentiment(str, Enum):
-    positive = "positive"
-    negative = "negative"
-    neutral = "neutral"
+from api.enums.reddit_sentiment_enum import ModelRedditSentiment
+
 
 class SubredditSearchBase(BaseModel):
     reddit_id: int
