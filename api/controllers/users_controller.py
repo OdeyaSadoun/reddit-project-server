@@ -3,7 +3,7 @@ import jwt
 from sqlalchemy.orm import Session
 from api.db.session import get_session
 
-from api.models import user_model, jwt_bearer_model
+from api.models import user_model, jwt_bearer_model,token_model
 from api.schemas import user_schema, auth_schema
 from api.utils import jwt_utils, auth_bearer
 
@@ -20,7 +20,18 @@ def register_user(user: user_schema.UserSchemaCreate, session: Session):
     session.commit()
     session.refresh(new_user)
 
-    return {"message": "user created successfully", "user": user_schema.UserSchemaResponse.from_orm(new_user)}
+    access = jwt_utils.create_access_token(new_user.id)
+    refresh = jwt_utils.create_refresh_token(new_user.id)
+
+    new_token = token_model.TokenTable(user_id=new_user.id, access_token=access, refresh_token=refresh, status=True)
+    session.add(new_token)
+    session.commit()
+    session.refresh(new_token)
+
+    return {
+        "access_token": access,
+        "refresh_token": refresh,
+    }
 
 
 def change_password(request: auth_schema.ChangePasswordSchema, session: Session):
