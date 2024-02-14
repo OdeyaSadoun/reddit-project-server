@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from api.db.session import get_session
 from typing import List
 
-
 from api.controllers import reddits_controller
 from api.exceptions import reddits_exceptions
 from api.schemas import reddit_schema, subreddit_schema
@@ -24,7 +23,7 @@ def get_posts(subreddit: str, category: str):
         raise HTTPException(status_code=500, detail=str(e))
     except reddits_exceptions.RedditResponseError as e:
         raise HTTPException(status_code=502, detail=str(e))
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Internal server error occurred")
     
 
@@ -34,11 +33,11 @@ def create_reddit_search(reddit_search: reddit_schema.RedditSearchCreate, db: Se
         result = reddits_controller.create_reddit_search(db, reddit_search.reddit, reddit_search.category, reddit_search.user_id)
         return result
     
-    except reddits_exceptions.RedditDatabaseAccessError as e:
+    except reddits_exceptions.RedditDatabaseAccessError:
         raise HTTPException(status_code=500, detail="Error accessing the database")
-    except reddits_exceptions.RedditValidationError as e:
+    except reddits_exceptions.RedditValidationError:
         raise HTTPException(status_code=400, detail="Invalid parameters provided")
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Internal server error occurred")
     
 

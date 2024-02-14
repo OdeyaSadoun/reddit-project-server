@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from fastapi import Depends, HTTPException, status, security
+from fastapi import Depends, security
 from functools import wraps
 from jwt import InvalidTokenError
 from sqlalchemy.orm import Session
@@ -37,6 +37,7 @@ def login(request: auth_schema.LoginSchema, db: Session):
         "access_token": access,
         "refresh_token": refresh,
     }
+
 
 def logout(jwt_token: str, db: Session):
     payload = auth_bearer.decodeJWT(jwt_token)
@@ -79,4 +80,3 @@ def token_required(func):
         except InvalidTokenError:
             raise auth_exceptions.InvalidToken()
     return wrapper
-

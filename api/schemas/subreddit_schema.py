@@ -12,8 +12,10 @@ class SubredditSearchBase(BaseModel):
     downs: int
     score: float
 
+
 class SubredditSearchCreate(SubredditSearchBase):
     pass
+
 
 class SubredditSearch(SubredditSearchBase):
     id: int

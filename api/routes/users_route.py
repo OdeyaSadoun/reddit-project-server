@@ -21,7 +21,6 @@ def register(user: user_schema.UserSchemaCreate, db: Session = Depends(get_sessi
         raise HTTPException(status_code=500, detail="Internal server error occurred") from e
 
 
-
 @router.get("/get_user_info", response_model=user_schema.UserSchemaResponse)
 def get_user_info(user: user_model.User = Depends(users_controller.get_user_from_token)):
     try:
@@ -32,5 +31,3 @@ def get_user_info(user: user_model.User = Depends(users_controller.get_user_from
         raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error occurred") from e
-
-

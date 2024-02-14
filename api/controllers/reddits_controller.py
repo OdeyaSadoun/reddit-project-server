@@ -1,4 +1,3 @@
-from http.client import INTERNAL_SERVER_ERROR
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -7,6 +6,7 @@ from api.exceptions import reddits_exceptions
 from api.models import reddit_model, subreddit_model
 from api.schemas import reddit_schema, subreddit_schema
 from api.services.reddit import connect_reddit
+
 
 def get_posts_from_reddit(subreddit: str, category: str):
     posts = connect_reddit.get_posts_by_subreddit_and_category(subreddit, category)
@@ -55,3 +55,4 @@ def get_history_posts_by_reddit_id(db: Session, reddit_id: int):
         return db.query(subreddit_model.SubredditSearch).filter(subreddit_model.SubredditSearch.reddit_id == reddit_id).all()
     except SQLAlchemyError as e:
         raise reddits_exceptions.RedditDatabaseAccessError("Error accessing the database") from e
+    

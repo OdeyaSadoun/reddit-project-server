@@ -14,6 +14,7 @@ class RedditSearchBase(BaseModel):
 class RedditSearchCreate(RedditSearchBase):
     pass
 
+
 class RedditSearch(RedditSearchBase):
     id: int
 

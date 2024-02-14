@@ -39,5 +39,3 @@ def sentiment_classify(text):
         raise sentiments_exceptions.ModelPredictionError("Failed to classify sentiment: received None label")
         
     return label
-
-

@@ -1,4 +1,3 @@
-import datetime
 from sqlalchemy import Column, Integer, String, Text, Float
 from sqlalchemy.dialects.postgresql import ENUM
 from api.db.session import Base

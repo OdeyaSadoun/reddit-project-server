@@ -46,7 +46,7 @@ def get_posts_by_subreddit_and_category(subreddit: str, category: str):
     
     headers = get_headers_for_connection_to_reddit_by_access_token()
 
-    res = requests.get(f'https://oauth.reddit.com/r/{subreddit}/{category}', headers=headers, params={'limit':'10'})
+    res = requests.get(f'https://oauth.reddit.com/r/{subreddit}/{category}', headers=headers, params={'limit': '10'})
     
     try:
         res.raise_for_status()
@@ -54,7 +54,6 @@ def get_posts_by_subreddit_and_category(subreddit: str, category: str):
     
     except requests.exceptions.HTTPError as e:
         raise reddits_exceptions.RedditRequestError("Error in Reddit API request") from e
-
 
 
 def get_format_posts_data(posts: dict) -> List[dict]:
@@ -73,7 +72,7 @@ def get_format_posts_data(posts: dict) -> List[dict]:
                 {
                     'subreddit': post['data']['subreddit'],
                     'title': post['data']['title'],
-                    'sentiment' : sentiment,
+                    'sentiment': sentiment,
                     'selftext': post['data']['selftext'],
                     'upvote_ratio': post['data']['upvote_ratio'],
                     'ups': post['data']['ups'],
