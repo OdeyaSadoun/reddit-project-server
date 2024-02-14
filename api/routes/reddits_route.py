@@ -19,6 +19,8 @@ def get_posts(subreddit: str, category: str):
     try:
         return reddits_controller.get_posts_from_reddit(subreddit, category)
     
+    except reddits_exceptions.RedditResultsNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e))
     except reddits_exceptions.RedditRequestError as e:
         raise HTTPException(status_code=500, detail=str(e))
     except reddits_exceptions.RedditResponseError as e:

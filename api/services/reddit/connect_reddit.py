@@ -46,10 +46,8 @@ def get_posts_by_subreddit_and_category(subreddit: str, category: str):
     
     headers = get_headers_for_connection_to_reddit_by_access_token()
 
-    res = requests.get(f'https://oauth.reddit.com/r/{subreddit}/{category}', headers=headers, params={'limit': '10'})
-    
     try:
-        res.raise_for_status()
+        res = requests.get(f'https://oauth.reddit.com/r/{subreddit}/{category}', headers=headers, params={'limit': '10'})
         return res.json()
     
     except requests.exceptions.HTTPError as e:

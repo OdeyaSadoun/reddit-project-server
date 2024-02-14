@@ -32,3 +32,7 @@ class RedditDatabaseAccessError(RedditSearchError):
 
 class RedditValidationError(RedditSearchError):
     pass
+
+
+class RedditResultsNotFound(Exception):
+    pass
