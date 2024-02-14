@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import requests
 from typing import List
-from api.exceptions import reddits_exceptions
+from api.exceptions import reddits_exceptions, sentiments_exceptions
 from api.services.sentiment_analysis import sentiments_model
 
 
@@ -61,7 +61,14 @@ def get_format_posts_data(posts: dict) -> List[dict]:
     post_list = []
     if 'data' in posts and 'children' in posts['data']:
         for post in posts['data']['children']:
-            sentiment = sentiments_model.sentiment_classify(post['data']['title'])
+            
+            try:
+                sentiment = sentiments_model.sentiment_classify(post['data']['title'])
+            except sentiments_exceptions.ModelInitializationError as e:
+                raise sentiments_exceptions.SentimentAnalysisError(e)
+            except sentiments_exceptions.ModelPredictionError as e:
+                raise sentiments_exceptions.SentimentAnalysisError(e)
+            
             post_list.append(
                 {
                     'subreddit': post['data']['subreddit'],
