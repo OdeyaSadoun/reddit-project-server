@@ -12,3 +12,12 @@ class RedditRequestError(RedditAPIError):
 
 class RedditUnexpectedResponseError(RedditAPIError):
     pass
+
+class RedditSearchError(Exception):
+    pass
+
+class RedditDatabaseAccessError(RedditSearchError):
+    pass
+
+class RedditValidationError(RedditSearchError):
+    pass

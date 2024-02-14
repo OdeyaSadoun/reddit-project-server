@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import requests
 from typing import List
+from api.exceptions import reddits_exceptions
 from api.services.sentiment_analysis import sentiments_model
 
 
@@ -24,12 +25,16 @@ def get_headers_for_connection_to_reddit_by_access_token():
     }
     headers = {'User-Agent': 'MyApi/0.0.1'}
 
-    res = requests.post('https://www.reddit.com/api/v1/access_token',
-                        auth=auth, data=data, headers=headers, params={'limit': '100', 'after': 't3_1ae05y3'})
-    token = res.json()['access_token']
-    headers = {**headers, **{'Authorization': f'bearer {token}'}}
-
-    return headers
+    try:
+        res = requests.post('https://www.reddit.com/api/v1/access_token',
+                            auth=auth, data=data, headers=headers, params={'limit': '100', 'after': 't3_1ae05y3'})
+        res.raise_for_status()
+        token = res.json()['access_token']
+        headers = {**headers, **{'Authorization': f'bearer {token}'}}
+        return headers
+    
+    except requests.exceptions.HTTPError as e:
+        raise reddits_exceptions.RedditAuthorizationError("Unauthorized access to Reddit API") from e
 
 
 def get_posts_by_subreddit(subreddit: str):
@@ -38,9 +43,18 @@ def get_posts_by_subreddit(subreddit: str):
 
 
 def get_posts_by_subreddit_and_category(subreddit: str, category: str):
+    
     headers = get_headers_for_connection_to_reddit_by_access_token()
+
     res = requests.get(f'https://oauth.reddit.com/r/{subreddit}/{category}', headers=headers, params={'limit':'10'})
-    return res.json()
+    
+    try:
+        res.raise_for_status()
+        return res.json()
+    
+    except requests.exceptions.HTTPError as e:
+        raise reddits_exceptions.RedditRequestError("Error in Reddit API request") from e
+
 
 
 def get_format_posts_data(posts: dict) -> List[dict]:
@@ -60,6 +74,6 @@ def get_format_posts_data(posts: dict) -> List[dict]:
                     'score': post['data']['score']
                 })
     else:
-        print("Unexpected response structure:", posts)
+        raise reddits_exceptions.RedditResponseError("Unexpected response structure")
 
     return post_list
