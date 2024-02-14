@@ -1,32 +1,33 @@
-from fastapi import Depends, HTTPException, status
 import jwt
+from fastapi import Depends
 from sqlalchemy.orm import Session
-from api.db.session import get_session
 
+from api.db.session import get_session
+from api.exceptions import auth_exceptions, users_exceptions
 from api.models import user_model, jwt_bearer_model,token_model
 from api.schemas import user_schema, auth_schema
 from api.utils import jwt_utils, auth_bearer
 
 
-def register_user(user: user_schema.UserSchemaCreate, session: Session):
-    existing_user = session.query(user_model.User).filter_by(email=user.email).first()
+def register_user(user: user_schema.UserSchemaCreate, db: Session):
+    existing_user = db.query(user_model.User).filter_by(email=user.email).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
+        raise users_exceptions.EmailAlreadyRegistered()
+    
     encrypted_password = jwt_utils.get_hashed_password(user.password)
     new_user = user_model.User(name=user.name, email=user.email, password=encrypted_password)
 
-    session.add(new_user)
-    session.commit()
-    session.refresh(new_user)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
 
     access = jwt_utils.create_access_token(new_user.id)
     refresh = jwt_utils.create_refresh_token(new_user.id)
 
     new_token = token_model.TokenTable(user_id=new_user.id, access_token=access, refresh_token=refresh, status=True)
-    session.add(new_token)
-    session.commit()
-    session.refresh(new_token)
+    db.add(new_token)
+    db.commit()
+    db.refresh(new_token)
 
     return {
         "access_token": access,
@@ -34,31 +35,32 @@ def register_user(user: user_schema.UserSchemaCreate, session: Session):
     }
 
 
-def change_password(request: auth_schema.ChangePasswordSchema, session: Session):
-    user = session.query(user_model.User).filter(user_model.User.email == request.email).first()
+def change_password(request: auth_schema.ChangePasswordSchema, db: Session):
+    user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
     if user is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
-
+        raise users_exceptions.UserNotFound()
+    
     if not jwt_utils.verify_password(request.old_password, user.password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid old password")
+        raise users_exceptions.InvalidOldPassword()
 
     encrypted_password = jwt_utils.get_hashed_password(request.new_password)
     user.password = encrypted_password
-    session.commit()
+    db.commit()
 
     return {"message": "Password changed successfully"}
 
 
-def get_user_from_token(token: str = Depends(jwt_bearer_model.JWTBearer()), session: Session = Depends(get_session)):
+def get_user_from_token(token: str = Depends(jwt_bearer_model.JWTBearer()), db: Session = Depends(get_session)):
 
     try:
         payload = auth_bearer.decodeJWT(token)
         user_id = payload['sub']
-        user = session.query(user_model.User).filter(user_model.User.id == user_id).first()
+        user = db.query(user_model.User).filter(user_model.User.id == user_id).first()
 
         if user is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            raise users_exceptions.UserNotFound()
 
         return user_schema.UserSchemaResponse.from_orm(user)
+    
     except jwt.PyJWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise auth_exceptions.UnauthorizedToken()
