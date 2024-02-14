@@ -12,9 +12,9 @@ jwt_bearer = jwt_bearer_model.JWTBearer()
 
 
 @router.post("/register")
-def register(user: user_schema.UserSchemaCreate, session: Session = Depends(get_session)):
+def register(user: user_schema.UserSchemaCreate, db: Session = Depends(get_session)):
     try:
-        return users_controller.register_user(user, session)
+        return users_controller.register_user(user, db)
     except users_exceptions.EmailAlreadyRegistered:
         raise HTTPException(status_code=400, detail="Email already registered")
 
