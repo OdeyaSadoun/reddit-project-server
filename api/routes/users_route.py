@@ -17,6 +17,8 @@ def register(user: user_schema.UserSchemaCreate, db: Session = Depends(get_sessi
         return users_controller.register_user(user, db)
     except users_exceptions.EmailAlreadyRegistered:
         raise HTTPException(status_code=400, detail="Email already registered")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error occurred") from e
 
 
 
@@ -28,5 +30,7 @@ def get_user_info(user: user_model.User = Depends(users_controller.get_user_from
         raise HTTPException(status_code=404, detail="User not found")
     except auth_exceptions.UnauthorizedToken:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error occurred") from e
 
 
