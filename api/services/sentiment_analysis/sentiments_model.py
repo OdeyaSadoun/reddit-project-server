@@ -3,6 +3,8 @@ from transformers import AutoTokenizer, AutoConfig
 import numpy as np
 from scipy.special import softmax
 
+from api.exceptions import sentiments_exceptions
+
 
 def get_label(config, ranking):
     highest_index = ranking[0]
@@ -19,6 +21,7 @@ def preprocess(text):
 
 
 def sentiment_classify(text):
+    # try:
     model = f"cardiffnlp/twitter-roberta-base-sentiment-latest"
     tokenizer = AutoTokenizer.from_pretrained(model)
     config = AutoConfig.from_pretrained(model)
@@ -33,3 +36,12 @@ def sentiment_classify(text):
     label = get_label(config, ranking)
     return label
 
+    # except Exception as e:
+    #         if isinstance(e, sentiments_exceptions.PreprocessingError):
+    #             raise sentiments_exceptions.PreprocessingError("Error during preprocessing") from e
+    #         elif isinstance(e, sentiments_exceptions.ModelInitializationError):
+    #             raise sentiments_exceptions.ModelInitializationError("Error during model initialization") from e
+    #         elif isinstance(e, sentiments_exceptions.ModelPredictionError):
+    #             raise sentiments_exceptions.ModelPredictionError("Error during model prediction") from e
+    #         else:
+    #             raise sentiments_exceptions.SentimentAnalysisError("General sentiment analysis error") from e
