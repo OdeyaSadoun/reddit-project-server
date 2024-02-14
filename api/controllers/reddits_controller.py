@@ -10,7 +10,6 @@ from api.services.reddit import connect_reddit
 
 def get_posts_from_reddit(subreddit: str, category: str):
     posts = connect_reddit.get_posts_by_subreddit_and_category(subreddit, category)
-    print("aaaa",posts)
     if (len(posts['data']['children']) <= 0):
         raise reddits_exceptions.RedditResultsNotFound("Results not found")
     return connect_reddit.get_format_posts_data(posts)
