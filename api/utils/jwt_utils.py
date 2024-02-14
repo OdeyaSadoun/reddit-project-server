@@ -5,8 +5,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pathlib import Path
 from typing import Union, Any
-from passlib.exc import PasswordHashError
-
+import passlib.exc as passlib_exc
 from api.exceptions import auth_exceptions
 
 
@@ -26,7 +25,7 @@ def get_hashed_password(password: str) -> str:
     try:
         return password_context.hash(password)
     
-    except PasswordHashError as e:
+    except passlib_exc.PasswordHashError as e:
         raise auth_exceptions.HashingError("Error hashing password") from e
 
 
@@ -34,7 +33,7 @@ def verify_password(password: str, hashed_pass: str) -> bool:
     try:
         return password_context.verify(password, hashed_pass)
     
-    except PasswordHashError as e:
+    except passlib_exc.PasswordHashError as e:
         raise auth_exceptions.HashingError("Error verifying password") from e
     
 
