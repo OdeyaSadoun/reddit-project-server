@@ -1,10 +1,14 @@
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from jose import jwt
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pathlib import Path
 from typing import Union, Any
+from passlib.exc import PasswordHashError
+
+from api.exceptions import auth_exceptions
+
 
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -19,32 +23,45 @@ password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_hashed_password(password: str) -> str:
-    return password_context.hash(password)
+    try:
+        return password_context.hash(password)
+    
+    except PasswordHashError as e:
+        raise auth_exceptions.HashingError("Error hashing password") from e
 
 
 def verify_password(password: str, hashed_pass: str) -> bool:
-    return password_context.verify(password, hashed_pass)
-
+    try:
+        return password_context.verify(password, hashed_pass)
+    
+    except PasswordHashError as e:
+        raise auth_exceptions.HashingError("Error verifying password") from e
+    
 
 def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> str:
-    if expires_delta is not None:
-        expires_delta = datetime.utcnow() + expires_delta
+    try:
+        if expires_delta is not None:
+            expires_delta = datetime.utcnow() + expires_delta
+        else:
+            expires_delta = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    else:
-        expires_delta = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-
-    to_encode = {"exp": expires_delta, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, ALGORITHM)
-
-    return encoded_jwt
+        to_encode = {"exp": expires_delta, "sub": str(subject)}
+        encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, ALGORITHM)
+        return encoded_jwt
+    
+    except JWTError as e:
+        raise auth_exceptions.TokenCreationError("Error creating access token") from e
 
 
 def create_refresh_token(subject: Union[str, Any], expires_delta: int = None) -> str:
-    if expires_delta is not None:
-        expires_delta = datetime.utcnow() + expires_delta
-    else:
-        expires_delta = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
-
-    to_encode = {"exp": expires_delta, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, ALGORITHM)
-    return encoded_jwt
+    try:
+        if expires_delta is not None:
+            expires_delta = datetime.utcnow() + expires_delta
+        else:
+            expires_delta = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
+        to_encode = {"exp": expires_delta, "sub": str(subject)}
+        encoded_jwt = jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, ALGORITHM)
+        return encoded_jwt
+    
+    except JWTError as e:
+        raise auth_exceptions.TokenCreationError("Error creating refresh token") from e

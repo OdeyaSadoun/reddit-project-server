@@ -19,6 +19,8 @@ def login_route(request: auth_schema.LoginSchema, db: Session = Depends(get_sess
         raise HTTPException(status_code=400, detail="Incorrect email")
     except auth_exceptions.IncorrectPassword:
         raise HTTPException(status_code=400, detail="Incorrect password")
+    except auth_exceptions.JWTDecodeError as e:
+        raise HTTPException(status_code=401, detail=str(e))
 
 @router.post('/logout')
 def logout_route(jwt_token: str = Depends(jwt_bearer), db: Session = Depends(get_session)):

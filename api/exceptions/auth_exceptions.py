@@ -12,3 +12,12 @@ class TokenBlocked(Exception):
 
 class InvalidToken(Exception):
     pass
+
+class JWTDecodeError(Exception):
+    pass
+
+class HashingError(Exception):
+    pass
+
+class TokenCreationError(Exception):
+    pass

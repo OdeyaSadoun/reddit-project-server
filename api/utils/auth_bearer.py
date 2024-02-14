@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import jwt
 from pathlib import Path
 
+from api.exceptions import auth_exceptions
 from api.models import jwt_bearer_model
 
 env_path = Path('.') / '.env'
@@ -21,7 +22,7 @@ def decodeJWT(jwtoken: str):
         payload = jwt.decode(jwtoken, JWT_SECRET_KEY, ALGORITHM)
         return payload
     except jwt.PyJWTError:
-        return None
+        raise auth_exceptions.JWTDecodeError("Failed to decode JWT token")
 
 
 jwt_bearer = jwt_bearer_model.JWTBearer()
