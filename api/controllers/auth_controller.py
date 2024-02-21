@@ -3,9 +3,10 @@ from fastapi import Depends, security
 from functools import wraps
 from jwt import InvalidTokenError
 from sqlalchemy.orm import Session
+from api.dal import auth_data_layer
 
 from api.exceptions import auth_exceptions
-from api.models import user_model, token_model
+from api.models import token_model
 from api.schemas import auth_schema
 from api.utils import auth_bearer, jwt_utils
 
@@ -16,50 +17,37 @@ def some_protected_endpoint(token: str = Depends(oauth2_scheme)):
     return {"token": token}
 
 
-def login(request: auth_schema.LoginSchema, db: Session):
-    user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
+def login(request: auth_schema.LoginSchema):
+    print("aaaaa")
+    user = auth_data_layer.get_user_by_email(request.email)
+    print(user)
     if user is None:
         raise auth_exceptions.IncorrectEmail()
-
+    print("bbbbb1")
     hashed_pass = user.password
     if not jwt_utils.verify_password(request.password, hashed_pass):
         raise auth_exceptions.IncorrectPassword()
+    print("ccccc")
 
     access = jwt_utils.create_access_token(user.id)
     refresh = jwt_utils.create_refresh_token(user.id)
-
-    new_token = token_model.TokenTable(user_id=user.id, access_token=access, refresh_token=refresh, status=True)
-    db.add(new_token)
-    db.commit()
-    db.refresh(new_token)
-
+    print("ddddd")
+    auth_data_layer.create_token(user.id, access, refresh)
+    print("eeeeee")
     return {
         "access_token": access,
         "refresh_token": refresh,
     }
 
 
+
 def logout(jwt_token: str, db: Session):
     payload = auth_bearer.decodeJWT(jwt_token)
     user_id = payload['sub']
 
-    now_utc = datetime.now(timezone.utc) 
+    auth_data_layer.delete_expired_tokens(user_id)
 
-    token_records = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id).all()
-
-    for record in token_records:
-        record.created_date = record.created_date.replace(tzinfo=timezone.utc)
-
-        if (now_utc - record.created_date).days > 1:
-            db.delete(record)
-
-    existing_token = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id,
-                                                                  token_model.TokenTable.access_token == jwt_token).first()
-
-    if existing_token:
-        existing_token.status = False
-        db.commit()
-        db.refresh(existing_token)
+    auth_data_layer.deactivate_token(user_id)
 
     return {"message": "Logout Successfully"}
 

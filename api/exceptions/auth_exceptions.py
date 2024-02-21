@@ -28,3 +28,11 @@ class HashingError(Exception):
 
 class TokenCreationError(Exception):
     pass
+
+
+class DeleteTokenExpiredError(Exception):
+    pass
+
+
+class DeactivateTokenExpiredError(Exception):
+    pass

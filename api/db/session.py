@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 
 from api.core.config import settings
 
@@ -18,3 +19,5 @@ def get_session():
         yield session
     finally:
         session.close()
+
+db: Session = next(get_session())

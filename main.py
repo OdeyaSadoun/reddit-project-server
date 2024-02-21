@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from api.db.session import engine, Base
 from api.routes import auth_route, users_route, reddits_route
+from api.db.session import get_session
 
 
 Base.metadata.create_all(bind=engine)
