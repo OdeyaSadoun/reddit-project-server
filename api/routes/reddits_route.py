@@ -14,7 +14,7 @@ router = APIRouter()
 jwt_bearer = jwt_bearer_model.JWTBearer()
 
 
-@router.get("/get_posts_by_subreddit")
+@router.get("/postsbysubreddit")
 def get_posts(subreddit: str, category: str):
     try:
         return reddits_controller.get_posts_from_reddit(subreddit, category)
