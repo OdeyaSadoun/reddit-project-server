@@ -18,6 +18,7 @@ def create_token(user_id: int, access_token: str, refresh_token: str) -> token_m
     except SQLAlchemyError as e:
         raise auth_exceptions.TokenCreationError(str(e))
 
+
 def delete_expired_tokens(db: Session, user_id: int):
     try:
         now_utc = datetime.now(timezone.utc) 
@@ -30,6 +31,7 @@ def delete_expired_tokens(db: Session, user_id: int):
     except SQLAlchemyError as e: 
         raise auth_exceptions.DeleteTokenExpiredError(str(e))
 
+
 def deactivate_token(db: Session, user_id: int):
     try:
         existing_token = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id).first()
@@ -39,6 +41,7 @@ def deactivate_token(db: Session, user_id: int):
             db.refresh(existing_token)
     except SQLAlchemyError as e:  
         raise auth_exceptions.DeactivateTokenExpiredError(str(e))
+
 
 def get_user_by_email(email: str) -> user_model.User:
     return db.query(user_model.User).filter(user_model.User.email == email).first()
