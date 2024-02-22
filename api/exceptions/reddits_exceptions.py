@@ -36,3 +36,7 @@ class RedditValidationError(RedditSearchError):
 
 class RedditResultsNotFound(Exception):
     pass
+
+
+class CreateRedditSearchError(Exception):
+    pass
