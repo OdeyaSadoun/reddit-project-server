@@ -33,21 +33,6 @@ def register_user(user: user_schema.UserSchemaCreate):
     }
 
 
-def change_password(request: auth_schema.ChangePasswordSchema, db: Session):
-    user = db.query(user_model.User).filter(user_model.User.email == request.email).first()
-    if user is None:
-        raise users_exceptions.UserNotFound()
-    
-    if not jwt_utils.verify_password(request.old_password, user.password):
-        raise users_exceptions.InvalidOldPassword()
-
-    encrypted_password = jwt_utils.get_hashed_password(request.new_password)
-    user.password = encrypted_password
-    db.commit()
-
-    return {"message": "Password changed successfully"}
-
-
 def get_user_from_token(token: str = Depends(jwt_bearer_model.JWTBearer()), db: Session = Depends(get_session)):
 
     try:
