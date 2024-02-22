@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from api.models import token_model, user_model
+from api.models import token_model
 from api.db.session import db
 from api.exceptions import auth_exceptions
 from sqlalchemy.exc import SQLAlchemyError

@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 import jwt
-from sqlalchemy.orm import Session
-from api.db.session import get_session
 from typing import List
 
 from api.controllers import reddits_controller

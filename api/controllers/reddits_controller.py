@@ -1,9 +1,4 @@
-from pydantic import ValidationError
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-
 from api.exceptions import reddits_exceptions
-from api.models import reddit_model, subreddit_model
 from api.schemas import reddit_schema, subreddit_schema
 from api.services.reddit import connect_reddit
 from api.dal import reddits_data_layer

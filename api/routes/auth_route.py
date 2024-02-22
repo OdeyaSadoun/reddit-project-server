@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 
 from api.controllers import auth_controller
-from api.db.session import get_session
 from api.exceptions import auth_exceptions
 from api.models import jwt_bearer_model
 from api.schemas import auth_schema, token_schema

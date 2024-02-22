@@ -1,11 +1,9 @@
 import jwt
 from fastapi import Depends
-from sqlalchemy.orm import Session
 
-from api.db.session import get_session
 from api.exceptions import auth_exceptions, users_exceptions
 from api.models import user_model, jwt_bearer_model, token_model
-from api.schemas import user_schema, auth_schema
+from api.schemas import user_schema
 from api.utils import jwt_utils, auth_bearer
 from api.dal import auth_data_layer, users_data_layer
 
