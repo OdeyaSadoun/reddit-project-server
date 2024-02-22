@@ -7,27 +7,25 @@ from api.exceptions import auth_exceptions, users_exceptions
 from api.models import user_model, jwt_bearer_model, token_model
 from api.schemas import user_schema, auth_schema
 from api.utils import jwt_utils, auth_bearer
+from api.dal import auth_data_layer, users_data_layer
 
 
-def register_user(user: user_schema.UserSchemaCreate, db: Session):
-    existing_user = db.query(user_model.User).filter_by(email=user.email).first()
+def register_user(user: user_schema.UserSchemaCreate):
+    existing_user = auth_data_layer.get_user_by_email(user.email)
+  
     if existing_user:
         raise users_exceptions.EmailAlreadyRegistered()
-    
+    print(user)
     encrypted_password = jwt_utils.get_hashed_password(user.password)
-    new_user = user_model.User(name=user.name, email=user.email, password=encrypted_password)
+    print(encrypted_password)
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    new_user = users_data_layer.create_new_user(user.name,user.email, encrypted_password)
 
+    print(new_user)
     access = jwt_utils.create_access_token(new_user.id)
     refresh = jwt_utils.create_refresh_token(new_user.id)
 
-    new_token = token_model.TokenTable(user_id=new_user.id, access_token=access, refresh_token=refresh, status=True)
-    db.add(new_token)
-    db.commit()
-    db.refresh(new_token)
+    auth_data_layer.create_token(new_user.id, access, refresh)
 
     return {
         "access_token": access,

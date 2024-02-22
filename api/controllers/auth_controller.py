@@ -3,8 +3,8 @@ from fastapi import Depends, security
 from functools import wraps
 from jwt import InvalidTokenError
 from sqlalchemy.orm import Session
-from api.dal import auth_data_layer
 
+from api.dal import auth_data_layer
 from api.exceptions import auth_exceptions
 from api.models import token_model
 from api.schemas import auth_schema
@@ -18,22 +18,19 @@ def some_protected_endpoint(token: str = Depends(oauth2_scheme)):
 
 
 def login(request: auth_schema.LoginSchema):
-    print("aaaaa")
     user = auth_data_layer.get_user_by_email(request.email)
-    print(user)
     if user is None:
         raise auth_exceptions.IncorrectEmail()
-    print("bbbbb1")
+    
     hashed_pass = user.password
     if not jwt_utils.verify_password(request.password, hashed_pass):
         raise auth_exceptions.IncorrectPassword()
-    print("ccccc")
 
     access = jwt_utils.create_access_token(user.id)
     refresh = jwt_utils.create_refresh_token(user.id)
-    print("ddddd")
+
     auth_data_layer.create_token(user.id, access, refresh)
-    print("eeeeee")
+
     return {
         "access_token": access,
         "refresh_token": refresh,

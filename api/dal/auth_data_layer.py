@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from sqlalchemy.orm import Session
 from api.models import token_model, user_model
 from api.db.session import db
 from api.exceptions import auth_exceptions
@@ -19,7 +18,7 @@ def create_token(user_id: int, access_token: str, refresh_token: str) -> token_m
         raise auth_exceptions.TokenCreationError(str(e))
 
 
-def delete_expired_tokens(db: Session, user_id: int):
+def delete_expired_tokens(user_id: int):
     try:
         now_utc = datetime.now(timezone.utc) 
         token_records = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id).all()
@@ -32,7 +31,7 @@ def delete_expired_tokens(db: Session, user_id: int):
         raise auth_exceptions.DeleteTokenExpiredError(str(e))
 
 
-def deactivate_token(db: Session, user_id: int):
+def deactivate_token(user_id: int):
     try:
         existing_token = db.query(token_model.TokenTable).filter(token_model.TokenTable.user_id == user_id).first()
         if existing_token:

@@ -8,3 +8,7 @@ class UserNotFound(Exception):
 
 class InvalidOldPassword(Exception):
     pass
+
+
+class CreateUserError(Exception):
+    pass
