@@ -15,6 +15,7 @@ jwt_bearer = jwt_bearer_model.JWTBearer()
 def login_route(request: auth_schema.LoginSchema):
     try:
         return auth_controller.login(request)
+    
     except auth_exceptions.IncorrectEmail:
         raise HTTPException(status_code=400, detail="Incorrect email")
     except auth_exceptions.IncorrectPassword:
@@ -28,9 +29,10 @@ def login_route(request: auth_schema.LoginSchema):
 
 
 @router.post('/logout')
-def logout_route(jwt_token: str = Depends(jwt_bearer), db: Session = Depends(get_session)):
+def logout_route(jwt_token: str = Depends(jwt_bearer)):
     try:
-        return auth_controller.logout(jwt_token, db)
+        return auth_controller.logout(jwt_token)
+    
     except auth_exceptions.UnauthorizedToken:
         raise HTTPException(status_code=401, detail="Unauthorized token")
     except auth_exceptions.DeleteTokenExpiredError as e:

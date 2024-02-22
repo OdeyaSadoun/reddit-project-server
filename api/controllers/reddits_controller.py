@@ -25,16 +25,9 @@ def create_subreddits_search(subreddits: list[subreddit_schema.SubredditSearchCr
     return reddits_data_layer.create_new_subreddits_search(subreddits)
 
 
-def get_history_searches_for_user(db: Session, user_id: int):
-    try:
-        return db.query(reddit_model.RedditSearch).filter(reddit_model.RedditSearch.user_id == user_id).all()
-    except SQLAlchemyError as e:
-        raise reddits_exceptions.RedditDatabaseAccessError("Error accessing the database") from e
+def get_history_searches_for_user(user_id: int):
+    return reddits_data_layer.get_history_searches_for_user(user_id)
 
 
-def get_history_posts_by_reddit_id(db: Session, reddit_id: int):
-    try:
-        return db.query(subreddit_model.SubredditSearch).filter(subreddit_model.SubredditSearch.reddit_id == reddit_id).all()
-    except SQLAlchemyError as e:
-        raise reddits_exceptions.RedditDatabaseAccessError("Error accessing the database") from e
-    
+def get_history_posts_by_reddit_id(reddit_id: int):
+    return reddits_data_layer.get_history_posts_by_reddit_id(reddit_id)

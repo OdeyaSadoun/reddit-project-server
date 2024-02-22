@@ -30,10 +30,9 @@ def get_posts(subreddit: str, category: str):
     
 
 @router.post("/redditsearches")
-def create_reddit_search(reddit_search: reddit_schema.RedditSearchCreate, db: Session = Depends(get_session)):
+def create_reddit_search(reddit_search: reddit_schema.RedditSearchCreate):
     try:
-        result = reddits_controller.create_reddit_search(db, reddit_search.reddit, reddit_search.category, reddit_search.user_id)
-        return result
+        return reddits_controller.create_reddit_search(reddit_search.reddit, reddit_search.category, reddit_search.user_id)
     
     except reddits_exceptions.RedditDatabaseAccessError:
         raise HTTPException(status_code=500, detail="Error accessing the database")
@@ -44,9 +43,10 @@ def create_reddit_search(reddit_search: reddit_schema.RedditSearchCreate, db: Se
     
 
 @router.post("/subredditsearches")
-def create_subreddit_search(subreddit_search: List[subreddit_schema.SubredditSearchCreate], db: Session = Depends(get_session)):
+def create_subreddit_search(subreddit_search: List[subreddit_schema.SubredditSearchCreate]):
     try:
-        return reddits_controller.create_subreddits_search(db, subreddit_search)
+        return reddits_controller.create_subreddits_search(subreddit_search)
+    
     except reddits_exceptions.RedditDatabaseAccessError as e:
         raise HTTPException(status_code=500, detail="Error accessing the database") from e
     except reddits_exceptions.RedditValidationError as e:
@@ -56,11 +56,12 @@ def create_subreddit_search(subreddit_search: List[subreddit_schema.SubredditSea
 
 
 @router.get("/history")
-def get_recent_searches(db: Session = Depends(get_session), jwt_token: str = Depends(jwt_bearer)):
+def get_recent_searches(jwt_token: str = Depends(jwt_bearer)):
     try:
         payload = auth_bearer.decodeJWT(jwt_token)
         user_id = payload['sub']
-        return reddits_controller.get_history_searches_for_user(db, user_id)
+        return reddits_controller.get_history_searches_for_user(user_id)
+    
     except reddits_exceptions.RedditDatabaseAccessError as e:
         raise HTTPException(status_code=500, detail="Error accessing the database") from e
     except jwt.PyJWTError as e:
@@ -70,9 +71,10 @@ def get_recent_searches(db: Session = Depends(get_session), jwt_token: str = Dep
 
 
 @router.get("/history/{reddit_id}")
-def get_recent_searches_for_user(reddit_id: int, db: Session = Depends(get_session)):
+def get_recent_searches_for_user(reddit_id: int):
     try:
-        return reddits_controller.get_history_posts_by_reddit_id(db, reddit_id)
+        return reddits_controller.get_history_posts_by_reddit_id(reddit_id)
+    
     except reddits_exceptions.RedditDatabaseAccessError as e:
         raise HTTPException(status_code=500, detail="Error accessing the database") from e
     except Exception as e:

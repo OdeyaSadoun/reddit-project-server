@@ -15,6 +15,7 @@ jwt_bearer = jwt_bearer_model.JWTBearer()
 def register(user: user_schema.UserSchemaCreate):
     try:
         return users_controller.register_user(user)
+    
     except users_exceptions.EmailAlreadyRegistered:
         raise HTTPException(status_code=400, detail="Email already registered")
     except users_exceptions.CreateUserError as e:
@@ -27,6 +28,7 @@ def register(user: user_schema.UserSchemaCreate):
 def get_user_info(user: user_model.User = Depends(users_controller.get_user_from_token)):
     try:
         return user
+    
     except users_exceptions.UserNotFound:
         raise HTTPException(status_code=404, detail="User not found")
     except auth_exceptions.UnauthorizedToken:
