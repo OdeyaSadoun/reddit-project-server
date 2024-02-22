@@ -4,7 +4,7 @@ from functools import wraps
 from jwt import InvalidTokenError
 from sqlalchemy.orm import Session
 
-from api.dal import auth_data_layer
+from api.dal import auth_data_layer, users_data_layer
 from api.exceptions import auth_exceptions
 from api.models import token_model
 from api.schemas import auth_schema
@@ -18,7 +18,7 @@ def some_protected_endpoint(token: str = Depends(oauth2_scheme)):
 
 
 def login(request: auth_schema.LoginSchema):
-    user = auth_data_layer.get_user_by_email(request.email)
+    user = users_data_layer.get_user_by_email(request.email)
     if user is None:
         raise auth_exceptions.IncorrectEmail()
     

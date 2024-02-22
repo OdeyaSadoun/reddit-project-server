@@ -17,6 +17,8 @@ def register(user: user_schema.UserSchemaCreate):
         return users_controller.register_user(user)
     except users_exceptions.EmailAlreadyRegistered:
         raise HTTPException(status_code=400, detail="Email already registered")
+    except users_exceptions.CreateUserError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error occurred") from e
 

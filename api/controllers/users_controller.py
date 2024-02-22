@@ -11,17 +11,15 @@ from api.dal import auth_data_layer, users_data_layer
 
 
 def register_user(user: user_schema.UserSchemaCreate):
-    existing_user = auth_data_layer.get_user_by_email(user.email)
+    existing_user = users_data_layer.get_user_by_email(user.email)
   
     if existing_user:
         raise users_exceptions.EmailAlreadyRegistered()
-    print(user)
+    
     encrypted_password = jwt_utils.get_hashed_password(user.password)
-    print(encrypted_password)
 
     new_user = users_data_layer.create_new_user(user.name,user.email, encrypted_password)
 
-    print(new_user)
     access = jwt_utils.create_access_token(new_user.id)
     refresh = jwt_utils.create_refresh_token(new_user.id)
 
@@ -33,12 +31,12 @@ def register_user(user: user_schema.UserSchemaCreate):
     }
 
 
-def get_user_from_token(token: str = Depends(jwt_bearer_model.JWTBearer()), db: Session = Depends(get_session)):
+def get_user_from_token(token: str = Depends(jwt_bearer_model.JWTBearer())):
 
     try:
         payload = auth_bearer.decodeJWT(token)
         user_id = payload['sub']
-        user = db.query(user_model.User).filter(user_model.User.id == user_id).first()
+        user = users_data_layer.get_user_by_id(user_id)
 
         if user is None:
             raise users_exceptions.UserNotFound()

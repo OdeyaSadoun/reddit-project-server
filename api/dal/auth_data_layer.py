@@ -42,5 +42,4 @@ def deactivate_token(user_id: int):
         raise auth_exceptions.DeactivateTokenExpiredError(str(e))
 
 
-def get_user_by_email(email: str) -> user_model.User:
-    return db.query(user_model.User).filter(user_model.User.email == email).first()
+
