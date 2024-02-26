@@ -1,7 +1,6 @@
 from fastapi import Depends, security
 from functools import wraps
 from jwt import InvalidTokenError
-from sqlalchemy.orm import Session
 
 from api.dal import auth_data_layer, users_data_layer
 from api.exceptions import auth_exceptions
