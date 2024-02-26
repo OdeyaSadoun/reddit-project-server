@@ -37,7 +37,7 @@ def login(request: auth_schema.LoginSchema):
 
 
 
-def logout(jwt_token: str, db: Session):
+def logout(jwt_token: str):
     payload = auth_bearer.decodeJWT(jwt_token)
     user_id = payload['sub']
 

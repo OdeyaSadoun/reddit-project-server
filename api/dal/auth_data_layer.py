@@ -5,7 +5,6 @@ from api.exceptions import auth_exceptions
 from sqlalchemy.exc import SQLAlchemyError
 
 
-
 def create_token(user_id: int, access_token: str, refresh_token: str) -> token_model.TokenTable:
     try:
         new_token = token_model.TokenTable(user_id=user_id, access_token=access_token, refresh_token=refresh_token, status=True)
